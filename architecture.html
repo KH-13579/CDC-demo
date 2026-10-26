@@ -1,0 +1,343 @@
+<title>mini-cdc-demo 構成図</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --ground: #F4F6F9;
+    --paper: #FFFFFF;
+    --ink: #18202C;
+    --muted: #5A6475;
+    --line: #C9D0DB;
+    --aws: #D9822B;
+    --aws-tint: #FFF6EC;
+    --cc: #4F55C9;
+    --cc-tint: #EFF0FC;
+    --pc: #2F7D57;
+    --pc-tint: #ECF6F0;
+    --flow: #0B7A83;
+    --flow-tint: #E3F4F5;
+    --node: #FFFFFF;
+    --font-sans: "IBM Plex Sans JP", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #11151C;
+      --paper: #181D26;
+      --ink: #E6EAF1;
+      --muted: #9AA4B5;
+      --line: #394253;
+      --aws: #F0A35A;
+      --aws-tint: #2A2118;
+      --cc: #9197F0;
+      --cc-tint: #1E2036;
+      --pc: #6CC196;
+      --pc-tint: #16271E;
+      --flow: #4FC4CC;
+      --flow-tint: #14292B;
+      --node: #1D232E;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #11151C;
+    --paper: #181D26;
+    --ink: #E6EAF1;
+    --muted: #9AA4B5;
+    --line: #394253;
+    --aws: #F0A35A;
+    --aws-tint: #2A2118;
+    --cc: #9197F0;
+    --cc-tint: #1E2036;
+    --pc: #6CC196;
+    --pc-tint: #16271E;
+    --flow: #4FC4CC;
+    --flow-tint: #14292B;
+    --node: #1D232E;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 40px 64px;
+    display: grid;
+    gap: 36px;
+  }
+  header { display: grid; gap: 8px; max-width: 68ch; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(24px, 3.2vw, 32px);
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+  h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  p { margin: 0; }
+  .lead { color: var(--muted); }
+  code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+
+  .diagram {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow-x: auto;
+    padding: 12px;
+  }
+  .diagram svg { display: block; width: 100%; min-width: 980px; height: auto; }
+
+  /* SVG styling through tokens */
+  .z-pc { fill: var(--pc-tint); stroke: var(--pc); }
+  .z-aws { fill: var(--aws-tint); stroke: var(--aws); }
+  .z-vpc { fill: none; stroke: var(--aws); stroke-dasharray: 6 5; }
+  .z-cc { fill: var(--cc-tint); stroke: var(--cc); }
+  .zone-label { font: 600 14px var(--font-sans); }
+  .zone-label.pc { fill: var(--pc); }
+  .zone-label.aws { fill: var(--aws); }
+  .zone-label.cc { fill: var(--cc); }
+  .node { fill: var(--node); stroke: var(--line); stroke-width: 1.2; }
+  .node.hi { stroke: var(--flow); stroke-width: 2; }
+  .group { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+  .t { fill: var(--ink); font: 600 13px var(--font-sans); }
+  .s { fill: var(--muted); font: 400 11.5px var(--font-sans); }
+  .m { fill: var(--ink); font: 400 11.5px var(--font-mono); }
+  .m.hi { fill: var(--flow); font-weight: 500; }
+  .row { fill: var(--ground); }
+  .row.hi { fill: var(--flow-tint); }
+  .edge { fill: none; stroke: var(--flow); stroke-width: 2; }
+  .edge.web { stroke: var(--muted); }
+  .badge circle { fill: var(--flow); }
+  .badge.web circle { fill: var(--muted); }
+  .badge text { fill: var(--paper); font: 700 11px var(--font-sans); text-anchor: middle; dominant-baseline: central; }
+  .arrowhead { fill: var(--flow); }
+  .arrowhead.web { fill: var(--muted); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    align-items: start;
+  }
+  ol.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  ol.flow li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; }
+  .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--flow); color: var(--paper);
+    font-size: 12px; font-weight: 700;
+    display: grid; place-items: center;
+    margin-top: 3px;
+  }
+  .num.web { background: var(--muted); }
+  .flow b { font-weight: 600; }
+  .flow span { color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .how {
+    display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px;
+    border-radius: 999px; border: 1px solid currentColor; white-space: nowrap;
+  }
+  .how.tf { color: var(--flow); }
+  .how.gui { color: var(--cc); }
+  .how.cli { color: var(--aws); }
+  .how.hand { color: var(--pc); }
+
+  .notes { display: grid; gap: 8px; margin: 0; padding-left: 1.2em; color: var(--ink); }
+  .notes li::marker { color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">mini-cdc-demo / aws · 案F</div>
+    <h1>承認フロー付き CDC デモの構成</h1>
+    <p class="lead">設計側で承認した資材の変更が、Aurora の変更ログ（WAL）から Confluent Cloud のフルマネージドコネクタを通って調達側の取り込み待ちテーブルと S3 に届くまでの全体像。</p>
+  </header>
+
+  <section class="diagram" aria-label="構成図">
+    <svg viewBox="0 0 1120 660" role="img" aria-labelledby="dg-title">
+      <title id="dg-title">ブラウザ、AWS（ALB・EC2・Aurora・S3）、Confluent Cloud（CDC Source・topic・2つの Sink）の構成とデータの流れ</title>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="arrowhead" d="M0,0 L10,5 L0,10 z"/>
+        </marker>
+        <marker id="ahw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="arrowhead web" d="M0,0 L10,5 L0,10 z"/>
+        </marker>
+      </defs>
+
+      <!-- Zones -->
+      <rect class="z-pc" x="16" y="20" width="180" height="620" rx="10"/>
+      <text class="zone-label pc" x="32" y="46">手元 PC</text>
+
+      <rect class="z-aws" x="216" y="20" width="532" height="620" rx="10"/>
+      <text class="zone-label aws" x="232" y="46">AWS（ap-northeast-1）</text>
+      <rect class="z-vpc" x="232" y="62" width="500" height="430" rx="8"/>
+      <text class="s" x="246" y="486">VPC（EC2 はインターネットに出られない）</text>
+
+      <rect class="z-cc" x="768" y="20" width="336" height="620" rx="10"/>
+      <text class="zone-label cc" x="784" y="46">Confluent Cloud（Basic クラスター）</text>
+
+      <!-- Browser -->
+      <rect class="node" x="36" y="252" width="140" height="86" rx="8"/>
+      <text class="t" x="52" y="280">ブラウザ</text>
+      <text class="s" x="52" y="302">engineering 画面</text>
+      <text class="s" x="52" y="320">procurement 画面</text>
+
+      <!-- ALB -->
+      <rect class="node" x="252" y="248" width="132" height="94" rx="8"/>
+      <text class="t" x="268" y="276">ALB :80</text>
+      <text class="s" x="268" y="298">/engineering*</text>
+      <text class="s" x="268" y="316">/procurement*</text>
+      <text class="s" x="268" y="334">それ以外は 404</text>
+
+      <!-- EC2 -->
+      <rect class="group" x="424" y="98" width="292" height="162" rx="8"/>
+      <text class="t" x="440" y="122">EC2（Ubuntu・systemd）</text>
+      <rect class="node" x="440" y="134" width="124" height="108" rx="6"/>
+      <text class="t" x="452" y="158">engineering</text>
+      <text class="m" x="452" y="180">:3101</text>
+      <text class="s" x="452" y="200">変更申請・承認</text>
+      <text class="s" x="452" y="218">Node / Express</text>
+      <rect class="node" x="576" y="134" width="124" height="108" rx="6"/>
+      <text class="t" x="588" y="158">procurement</text>
+      <text class="m" x="588" y="180">:3102</text>
+      <text class="s" x="588" y="200">取り込み承認</text>
+      <text class="s" x="588" y="218">Node / Express</text>
+
+      <!-- Aurora -->
+      <rect class="node" x="424" y="300" width="292" height="176" rx="8"/>
+      <text class="t" x="440" y="324">Aurora PostgreSQL 17（共有）</text>
+      <text class="s" x="440" y="342">rds.logical_replication = 1</text>
+      <rect class="row" x="436" y="352" width="268" height="24" rx="4"/>
+      <text class="m" x="446" y="368">engineering.material_change_requests</text>
+      <rect class="row hi" x="436" y="380" width="268" height="24" rx="4"/>
+      <text class="m hi" x="446" y="396">engineering.materials  ← CDC 対象</text>
+      <rect class="row" x="436" y="408" width="268" height="24" rx="4"/>
+      <text class="m" x="446" y="424">procurement.incoming_material_changes</text>
+      <rect class="row" x="436" y="436" width="268" height="24" rx="4"/>
+      <text class="m" x="446" y="452">procurement.materials</text>
+
+      <!-- S3 -->
+      <rect class="node" x="424" y="524" width="292" height="84" rx="8"/>
+      <text class="t" x="440" y="550">S3 バケット</text>
+      <text class="s" x="440" y="572">CDC イベントのアーカイブ（JSON）</text>
+      <text class="m" x="440" y="592">topics/…/year=/month=/day=/hour=/</text>
+
+      <!-- Confluent nodes -->
+      <rect class="node" x="788" y="86" width="296" height="72" rx="8"/>
+      <text class="t" x="804" y="112">Postgres CDC Source V2</text>
+      <text class="s" x="804" y="132">slot: mini_aws_engineering_slot</text>
+      <text class="s" x="804" y="149">After-state only・materials のみ対象</text>
+
+      <rect class="node hi" x="788" y="200" width="296" height="64" rx="8"/>
+      <text class="t" x="804" y="226">topic（AVRO）</text>
+      <text class="m" x="804" y="248">mini_aws.engineering.materials</text>
+
+      <rect class="node" x="788" y="330" width="140" height="84" rx="8"/>
+      <text class="t" x="800" y="356">Postgres Sink</text>
+      <text class="s" x="800" y="376">ReplaceField SMT</text>
+      <text class="s" x="800" y="394">列名を proposed_* に</text>
+
+      <rect class="node" x="944" y="330" width="140" height="84" rx="8"/>
+      <text class="t" x="956" y="356">Amazon S3 Sink</text>
+      <text class="s" x="956" y="376">IAM Role で書き込み</text>
+      <text class="s" x="956" y="394">10 分ごとに出力</text>
+
+      <rect class="node" x="788" y="578" width="296" height="44" rx="8"/>
+      <text class="t" x="804" y="598">Schema Registry</text>
+      <text class="s" x="804" y="614">topic の AVRO スキーマを管理</text>
+
+      <!-- Edges: web (grey) -->
+      <path class="edge web" d="M176 295 L250 295" marker-end="url(#ahw)"/>
+      <path class="edge web" d="M384 270 L438 190" marker-end="url(#ahw)"/>
+      <path class="edge web" d="M318 248 L318 90 L638 90 L638 132" marker-end="url(#ahw)"/>
+
+      <!-- Edges: data flow (teal) -->
+      <path class="edge" d="M500 242 L500 298" marker-end="url(#ah)"/>
+      <path class="edge" d="M716 392 L752 392 L752 122 L786 122" marker-end="url(#ah)"/>
+      <path class="edge" d="M936 158 L936 198" marker-end="url(#ah)"/>
+      <path class="edge" d="M858 264 L858 328" marker-end="url(#ah)"/>
+      <path class="edge" d="M1014 264 L1014 328" marker-end="url(#ah)"/>
+      <path class="edge" d="M788 400 L766 400 L766 420 L718 420" marker-end="url(#ah)"/>
+      <path class="edge" d="M1014 414 L1014 566 L718 566" marker-end="url(#ah)"/>
+      <path class="edge" d="M640 242 L640 298" marker-end="url(#ah)"/>
+
+      <!-- Badges -->
+      <g class="badge web"><circle cx="213" cy="282" r="10"/><text x="213" y="282">1</text></g>
+      <g class="badge"><circle cx="486" cy="290" r="10"/><text x="486" y="290">2</text></g>
+      <g class="badge"><circle cx="752" cy="258" r="10"/><text x="752" y="258">3</text></g>
+      <g class="badge"><circle cx="950" cy="178" r="10"/><text x="950" y="178">4</text></g>
+      <g class="badge"><circle cx="776" cy="410" r="10"/><text x="776" y="410">5</text></g>
+      <g class="badge"><circle cx="654" cy="290" r="10"/><text x="654" y="290">6</text></g>
+      <g class="badge"><circle cx="1014" cy="490" r="10"/><text x="1014" y="490">7</text></g>
+    </svg>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h2>データの流れ</h2>
+      <ol class="flow">
+        <li><span class="num web">1</span><div><b>ブラウザ → ALB → EC2</b><br><span>ALB がパスで 2 つのアプリに振り分ける。ALB はパスを書き換えないので、アプリは <code>BASE_PATH</code> の下で待ち受ける。</span></div></li>
+        <li><span class="num">2</span><div><b>設計側で承認</b><br><span>申請テーブルの確定と <code>engineering.materials</code> の UPDATE を 1 つのトランザクションで実行する。この UPDATE が CDC の起点。</span></div></li>
+        <li><span class="num">3</span><div><b>WAL を CDC Source が読む</b><br><span>publication と replication slot 経由で、変更後の行だけを取り出す。</span></div></li>
+        <li><span class="num">4</span><div><b>topic に AVRO で書き込む</b><br><span>スキーマは Schema Registry が管理する。</span></div></li>
+        <li><span class="num">5</span><div><b>Postgres Sink が staging に INSERT</b><br><span>SMT で必要な 3 列に絞り、列名を <code>proposed_*</code> に変えて <code>incoming_material_changes</code> に <code>pending</code> で入れる。</span></div></li>
+        <li><span class="num">6</span><div><b>調達側で Accept</b><br><span>staging の確定と <code>procurement.materials</code> への UPSERT を 1 つのトランザクションで実行する。</span></div></li>
+        <li><span class="num">7</span><div><b>S3 Sink がアーカイブ</b><br><span>同じ topic を独立に読み、10 分ごとに JSON で S3 に書き出す。</span></div></li>
+      </ol>
+    </div>
+
+    <div>
+      <h2>何で作ったか</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>構成要素</th><th>作り方</th></tr></thead>
+          <tbody>
+            <tr><td>Aurora のカスタムパラメータグループと再起動</td><td><span class="how cli">CLI</span></td></tr>
+            <tr><td>Aurora の SG ルール（Confluent の Egress IP・開発 PC）<br><code class="mono">terraform/</code></td><td><span class="how tf">Terraform</span></td></tr>
+            <tr><td>テーブル・publication<br><code class="mono">init-aurora.sql</code></td><td><span class="how cli">psql</span></td></tr>
+            <tr><td>EC2 上のアプリ 2 つ（S3 経由で持ち込み、systemd で常駐）</td><td><span class="how hand">手作業</span></td></tr>
+            <tr><td>ALB・ターゲットグループ・SG、S3 バケット、IAM Role<br><code class="mono">terraform-alb-s3/</code></td><td><span class="how tf">Terraform</span></td></tr>
+            <tr><td>Environment・クラスター・Schema Registry、コネクタ 3 つ、Provider Integration</td><td><span class="how gui">GUI</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>構成上のポイント</h2>
+    <ul class="notes">
+      <li>コネクタはすべて Confluent Cloud のフルマネージド。Aurora を公開設定にし、SG で Confluent の Egress IP だけに 5432 番を開けている。</li>
+      <li>S3 Sink は IAM Role（Provider Integration）で書き込む。組織の規約でアクセスキーの新規作成が制限されているため。</li>
+      <li>ALB・S3・IAM Role は Aurora の SG ルールと Terraform の state を分けている。ALB だけ destroy しても CDC の経路は残る。</li>
+      <li>ALB は起動中ずっと時間課金される。後片付けは「コネクタ削除 → slot と publication 削除 → destroy」の順。</li>
+    </ul>
+  </section>
+</div>

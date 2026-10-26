@@ -1,0 +1,28 @@
+# 配置先: /etc/systemd/system/mini-engineering.service
+#
+# 既存の epc-* Docker コンテナ群とは無関係な独立プロセスとして常駐させる。
+# 前提:
+#   - /usr/local/bin/node に Node.js が配置済み（README の Step 8 参照）
+#   - /opt/mini-cdc-demo/engineering に server.js / public/ / node_modules/ が配置済み
+#   - /etc/mini-cdc-demo/engineering.env に環境変数（DATABASE_URL 等）が配置済み（chmod 600）
+[Unit]
+Description=mini-cdc-demo engineering app (Node/Express)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/mini-cdc-demo/engineering
+EnvironmentFile=/etc/mini-cdc-demo/engineering.env
+ExecStart=/usr/local/bin/node server.js
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mini-engineering
+
+[Install]
+WantedBy=multi-user.target

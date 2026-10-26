@@ -1,0 +1,35 @@
+# このファイルを terraform.tfvars にコピーして値を埋める。
+# terraform.tfvars 自体はコミットしない（.gitignore 済み）。
+# 値の確認方法は ../README.md の Step 0 を参照。
+
+# ---- ALB --------------------------------------------------------------------
+
+# aws ec2 describe-instances --instance-ids i-0123456789abcdef0 \
+#   --query 'Reservations[0].Instances[0].[VpcId,SubnetId,SecurityGroups[].GroupId]'
+vpc_id                = "vpc-xxxxxxxxxxxxxxxxx"
+ec2_instance_id       = "i-0123456789abcdef0"
+ec2_security_group_id = "sg-xxxxxxxxxxxxxxxxx"
+
+# 異なる AZ の 2 サブネット以上。インターネット向け ALB なので
+# Internet Gateway へのルートを持つサブネットを選ぶ。
+alb_subnet_ids = [
+  "subnet-xxxxxxxxxxxxxxxxx",
+  "subnet-yyyyyyyyyyyyyyyyy",
+]
+
+# ALB の 80 番に接続を許可する送信元（curl https://checkip.amazonaws.com/）。
+# 0.0.0.0/0 は使わない。
+mini_app_allowed_cidrs = [
+  "203.0.113.10/32",
+]
+
+# ---- S3 Sink ----------------------------------------------------------------
+
+# グローバルで一意な名前。Confluent クラスターと同じリージョンに作る。
+s3_sink_bucket_name = "example-mini-cdc-sink"
+
+# Confluent Cloud UI の Provider Integration (AWS) にロール ARN を入力すると
+# trust policy が提示される。その Principal と sts:ExternalId を設定する（README Step 8 参照）。
+# ダミー値のままだと IAM が Principal を拒否して apply が失敗する。
+confluent_provider_integration_role_arn    = "arn:aws:iam::REPLACE_ME:role/cspi-xxxxx"
+confluent_provider_integration_external_id = "REPLACE_ME"

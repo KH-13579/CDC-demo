@@ -1,0 +1,15 @@
+# 依存・ビルド成果物
+node_modules/
+*.tar.gz
+*.tar.xz
+
+# 構築メモ（認証情報・個人情報を含みうる）と環境変数
+done.md
+.env
+*.env
+
+# Terraform の state / 実値入り tfvars / プロバイダ本体（各ディレクトリの .gitignore と二重で防ぐ）
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars

@@ -1,0 +1,20 @@
+# このファイルを terraform.tfvars にコピーして値を埋める。
+# terraform.tfvars 自体はコミットしない（.gitignore 済み）。
+# 値の確認方法は ../README.md の Step 0 を参照。
+
+# aws rds describe-db-clusters --db-cluster-identifier demo-shared-db \
+#   --query 'DBClusters[0].VpcSecurityGroups[].VpcSecurityGroupId' --output text
+aurora_security_group_id = "sg-xxxxxxxxxxxxxxxxx"
+
+# Confluent Cloud > Cluster Settings > Networking の Egress IP リスト。
+# Confluent Cloud を用意する前は [] のままでよい（後から追記して apply する）。
+confluent_egress_cidrs = [
+  # "18.xxx.xxx.xxx/32",
+  # "3.xxx.xxx.xxx/32",
+]
+
+# 自分の PC のグローバル IP（curl https://checkip.amazonaws.com/）。
+# ローカル動作確認が終わったら [] に戻して apply すれば閉じられる。
+developer_cidrs = [
+  # "203.0.113.10/32",
+]
